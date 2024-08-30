@@ -1,1 +1,1 @@
-esto es una prueba para ver el formato en el que tengo que escribir si quiero que lo lea
+Este es un ejemplo de contenido para el archivo.</br>Esta es una nueva línea añadida al archivo.</br>
