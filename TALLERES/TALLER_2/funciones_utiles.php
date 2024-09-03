@@ -5,6 +5,6 @@ function doblar($numero) {
 }
 
 function saludoPersonalizado($nombre) {
-    return "¡Bienvenido, $nombre!";
+    return "¡Bienvenido., $nombre!";
 }
 ?>

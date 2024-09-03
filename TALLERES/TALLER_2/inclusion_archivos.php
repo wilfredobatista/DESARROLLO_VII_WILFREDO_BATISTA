@@ -32,7 +32,7 @@ echo "Esta línea se ejecutará aunque el archivo no exista.<br>";
 echo "<h3>Intentando requerir un archivo inexistente:</h3>";
 // Comenta la siguiente línea para evitar un error fatal
 // require 'archivo_inexistente.php';
-echo "Esta línea no se ejecutará si se requiere un archivo inexistente.<br>";
+echo "Esta línea no se ejecutará si se requiere un archivo inexistente.<br>.";
 
 ?>
             
