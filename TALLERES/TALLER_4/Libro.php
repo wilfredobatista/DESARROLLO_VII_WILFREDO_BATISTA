@@ -60,22 +60,13 @@ class Libro implements Prestable{
     public function estaDisponible() {
         return $this->disponible;
     }
-
-
-
-
-
-
-
-
 }
 
 // Ejemplo de uso
-$libro = new Libro("Rayuela", "Julio Cortázar", 1963);
-echo $libro->obtenerInformacion() . "\n";
-echo "Disponible: " . ($libro->estaDisponible() ? "Sí" : "No") . "\n";
-$libro->prestar();
-echo "Disponible después de prestar: " . ($libro->estaDisponible() ? "Sí" : "No") . "\n";
-$libro->devolver();
-echo "Disponible después de devolver: " . ($libro->estaDisponible() ? "Sí" : "No") . "\n";
-        
+// $libro = new Libro("Rayuela", "Julio Cortázar", 1963);
+// echo $libro->obtenerInformacion() . "\n";
+// echo "Disponible: " . ($libro->estaDisponible() ? "Sí" : "No") . "\n";
+// $libro->prestar();
+// echo "Disponible después de prestar: " . ($libro->estaDisponible() ? "Sí" : "No") . "\n";
+// $libro->devolver();
+// echo "Disponible después de devolver: " . ($libro->estaDisponible() ? "Sí" : "No") . "\n";
