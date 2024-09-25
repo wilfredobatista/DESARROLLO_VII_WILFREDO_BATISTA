@@ -1,12 +1,5 @@
 <?php
-// Archivo: clases.php
-
-interface Detalle
-{
-    public  function DetallesEspecificos($string);
-}
-class Tarea implements Detalle
-{
+class Tarea {
     public $id;
     public $titulo;
     public $descripcion;
@@ -14,122 +7,103 @@ class Tarea implements Detalle
     public $prioridad;
     public $fechaCreacion;
     public $tipo;
-
-
-    public function __construct($datos)
-    {
-        foreach ($datos as $key => $value) {
-            $this->$key = $value;
-        }
-    }
-
-    // Implementar estos getters
-    public function getEstado()
-    {
-        return $this->estado;
-    }
-    public function getPrioridad()
-    {
-        return $this->prioridad;
-    }
-    public  function DetallesEspecificos($string) {}
-}
-
-class GestorTareas
-{
-    private $tareas = [];
-
-    public function cargarTareas()
-    {
-        $json = file_get_contents('tareas.json');
-        $data = json_decode($json, true);
-        foreach ($data as $tareaData) {
-            switch ($tareaData['tipo']){
-                case'desarrollo':
-                    $tarea= new TareaDesarrollo($tareaData);
-                    break;
-                case'diseno':
-                    $tarea= new TareaDiseno($tareaData);
-                    break;
-                case 'testing':
-                    $tarea= new TareaTesting($tareaData);
-                    break;
-            }
-            // $this ->tarea[]= $tarea;
-            
-            $tarea = new Tarea($tareaData);
-            $this->tareas[] = $tarea;
-        }
-
-        return $this->tareas;
-    }
-
-
-function agregarTarea($tarea){
-
-
-}
-function eliminarTarea($id){}
-
-}
-
-
-
-class TareaDesarrollo extends Tarea
-{
-    public $lenguajeProgramacion = " ";
-
-    public function DetallesEspecificos($lenguaje)
-    { //retorna el nombre del lenguaje
-
-        return $lenguaje;
-    }
-}
-
-class TareaDiseno extends Tarea
-{ //devuelve una caden con el tipo de tarea
-    public $herramientaDiseno = "";
-
-    public function DetallesEspecificos($string)
-    {
-        return $string;
-    }
-}
-
-
-
-class TareaTesting extends Tarea
-{
+    public $lenguajeProgramacion;
+    public $herramientaDiseno;
     public $tipoTest;
-    public function DetallesEspecificos($tring) {}
+
+    public function __construct($data) {
+        $this->id = isset($data['id']) ? $data['id'] : null;
+        $this->titulo = $data['titulo'];
+        $this->descripcion = $data['descripcion'];
+        $this->estado = isset($data['estado']) ? $data['estado'] : 'pendiente';
+        $this->prioridad = $data['prioridad'];
+        $this->fechaCreacion = isset($data['fechaCreacion']) ? $data['fechaCreacion'] : date('Y-m-d');
+        $this->tipo = $data['tipo'];
+        $this->lenguajeProgramacion = isset($data['lenguajeProgramacion']) ? $data['lenguajeProgramacion'] : null;
+        $this->herramientaDiseno = isset($data['herramientaDiseno']) ? $data['herramientaDiseno'] : null;
+        $this->tipoTest = isset($data['tipoTest']) ? $data['tipoTest'] : null;
+    }
 }
 
+class GestorTareas {
+    private $archivo = 'tareas.json';
 
-// class Prueba {
-//     private $tipoTest;
+    public function cargarTareas() {
+        if (file_exists($this->archivo)) {
+            $contenido = file_get_contents($this->archivo);
+            $data = json_decode($contenido, true);
+            $tareas = [];
+            foreach ($data as $item) {
+                $tareas[] = new Tarea($item);
+            }
+            return $tareas;
+        }
+        return [];
+    }
 
-//     public function __construct($tipoTest) {
-//         $this->setTipoTest($tipoTest);
-//     }
+    public function guardarTareas($tareas) {
+        file_put_contents($this->archivo, json_encode($tareas, JSON_PRETTY_PRINT));
+    }
 
-//     public function setTipoTest($tipoTest) {
-//         $tiposValidos = ['unitario', 'integracion', 'e2e'];
-//         if (in_array($tipoTest, $tiposValidos)) {
-//             $this->tipoTest = $tipoTest;
-//         } else {
-//             throw new Exception("Tipo de test inválido. Debe ser 'unitario', 'integracion', o 'e2e'.");
-//         }
-//     }
+    public function agregarTarea($nuevaTarea) {
+        $tareas = $this->cargarTareas();
+        $nuevaTarea->id = count($tareas) + 1;
+        $tareas[] = $nuevaTarea;
+        $this->guardarTareas($tareas);
+    }
 
-//     public function getTipoTest() {
-//         return $this->tipoTest;
-//     }
-// }
+    public function editarTarea($id, $tareaEditada) {
+        $tareas = $this->cargarTareas();
+        foreach ($tareas as $key => $tarea) {
+            if ($tarea->id == $id) {
+                $tareaEditada->id = $id;
+                $tareas[$key] = $tareaEditada;
+                break;
+            }
+        }
+        $this->guardarTareas($tareas);
+    }
 
+    public function eliminarTarea($id) {
+        $tareas = $this->cargarTareas();
+        foreach ($tareas as $key => $tarea) {
+            if ($tarea->id == $id) {
+                unset($tareas[$key]);
+                break;
+            }
+        }
+        $this->guardarTareas(array_values($tareas));
+    }
 
+    public function cambiarEstado($id, $nuevoEstado) {
+        $tareas = $this->cargarTareas();
+        foreach ($tareas as $tarea) {
+            if ($tarea->id == $id) {
+                $tarea->estado = $nuevoEstado;
+                break;
+            }
+        }
+        $this->guardarTareas($tareas);
+    }
 
+    public function filtrarTareasPorEstado($estado) {
+        $tareas = $this->cargarTareas();
+        if ($estado) {
+            return array_filter($tareas, function ($tarea) use ($estado) {
+                return $tarea->estado === $estado;
+            });
+        }
+        return $tareas;
+    }
 
-// Implementar:
-// 1. La interfaz Detalle
-// 2. Modificar la clase Tarea para implementar la interfaz Detalle
-// 3. Las clases TareaDesarrollo, TareaDiseno y TareaTesting que hereden de Tarea
+    public function ordenarTareas($field, $direction) {
+        $tareas = $this->cargarTareas();
+        usort($tareas, function ($a, $b) use ($field, $direction) {
+            $valueA = $a->{$field};
+            $valueB = $b->{$field};
+            return $direction === 'ASC' ? strcmp($valueA, $valueB) : strcmp($valueB, $valueA);
+        });
+        return $tareas;
+    }
+}
+?>

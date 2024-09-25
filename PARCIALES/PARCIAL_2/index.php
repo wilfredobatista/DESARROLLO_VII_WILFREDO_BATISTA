@@ -17,45 +17,54 @@ $sortDirection = isset($_GET['direction']) ? $_GET['direction'] : 'ASC';
 $filterEstado = isset($_GET['filterEstado']) ? $_GET['filterEstado'] : '';
 
 $tareas = null;
+$gestorTareas = new GestorTareas();
 
 // Procesar la acción
 switch ($action) {
     case 'add':
-        // Los estudiantes deben implementar esta lógica
+        $nuevaTarea = new Tarea($_GET);
+        $gestorTareas->agregarTarea($nuevaTarea);
+        $mensaje = "Tarea agregada exitosamente";
         break;
 
     case 'edit':
-        // Los estudiantes deben implementar esta lógica
+        $id = $_GET['id'];
+        $tareaEditada = new Tarea($_GET);
+        $gestorTareas->editarTarea($id, $tareaEditada);
+        $mensaje = "Tarea actualizada exitosamente";
         break;
 
     case 'delete':
-        // Los estudiantes deben implementar esta lógica
+        $id = $_GET['id'];
+        $gestorTareas->eliminarTarea($id);
+        $mensaje = "Tarea eliminada exitosamente";
         break;
 
     case 'status':
-        // Los estudiantes deben implementar esta lógica
+        $id = $_GET['id'];
+        $nuevoEstado = $_GET['estado'];
+        $gestorTareas->cambiarEstado($id, $nuevoEstado);
+        $mensaje = "Estado de la tarea actualizado";
         break;
 
     case 'filter':
-        // Los estudiantes deben implementar esta lógica
+        $tareas = $gestorTareas->filtrarTareasPorEstado($filterEstado);
         break;
 
     case 'list':
     default:
-        // Por ahora, simplemente cargamos todas las tareas
+        $tareas = $gestorTareas->ordenarTareas($sortField, $sortDirection);
         break;
 }
 
 // Cargar las tareas si aún no se han cargado
 if ($tareas === null) {
-    $gestorTareas = new GestorTareas();
     $tareas = $gestorTareas->cargarTareas();
 }
 
 ?>
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -63,11 +72,10 @@ if ($tareas === null) {
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
 </head>
-
 <body>
     <div class="container mt-5">
         <h1 class="mb-4">Gestor de Tareas</h1>
-
+        
         <?php if (isset($mensaje)): ?>
             <div class="alert alert-success" role="alert">
                 <?php echo $mensaje; ?>
@@ -80,14 +88,14 @@ if ($tareas === null) {
             <?php if ($tareaEnEdicion): ?>
                 <input type="hidden" name="id" value="<?php echo $tareaEnEdicion->id; ?>">
             <?php endif; ?>
-
+            
             <div class="col">
                 <input type="text" class="form-control" name="titulo" placeholder="Título" required
-                    value="<?php echo $tareaEnEdicion ? $tareaEnEdicion->titulo : ''; ?>">
+                       value="<?php echo $tareaEnEdicion ? $tareaEnEdicion->titulo : ''; ?>">
             </div>
             <div class="col">
                 <input type="text" class="form-control" name="descripcion" placeholder="Descripción" required
-                    value="<?php echo $tareaEnEdicion ? $tareaEnEdicion->descripcion : ''; ?>">
+                       value="<?php echo $tareaEnEdicion ? $tareaEnEdicion->descripcion : ''; ?>">
             </div>
             <div class="col">
                 <select class="form-select" name="prioridad" required>
@@ -150,8 +158,7 @@ if ($tareas === null) {
                     <th><a href="index.php?action=sort&field=descripcion&direction=<?php echo $sortField == 'descripcion' && $sortDirection == 'ASC' ? 'DESC' : 'ASC'; ?>">Descripción <?php echo $sortField == 'descripcion' ? ($sortDirection == 'ASC' ? '▲' : '▼') : ''; ?></a></th>
                     <th><a href="index.php?action=sort&field=estado&direction=<?php echo $sortField == 'estado' && $sortDirection == 'ASC' ? 'DESC' : 'ASC'; ?>">Estado <?php echo $sortField == 'estado' ? ($sortDirection == 'ASC' ? '▲' : '▼') : ''; ?></a></th>
                     <th><a href="index.php?action=sort&field=prioridad&direction=<?php echo $sortField == 'prioridad' && $sortDirection == 'ASC' ? 'DESC' : 'ASC'; ?>">Prioridad <?php echo $sortField == 'prioridad' ? ($sortDirection == 'ASC' ? '▲' : '▼') : ''; ?></a></th>
-                    <th><a href="index.php?action=sort&field=tipo&direction=<?php echo $sortField == 'tipo' && $sortDirection == 'ASC' ? 'DESC' : 'ASC'; ?>">Tipo <?php echo $sortField == 'tipo' ? ($sortDirection == 'ASC' ? '▲' : '▼') : ''; ?></a></th>
-                    <th><a href="index.php?action=sort&field=fechaCreacion&direction=<?php echo $sortField == 'fechaCreacion' && $sortDirection == 'ASC' ? 'DESC' : 'ASC'; ?>">Fecha Creación <?php echo $sortField == 'fechaCreacion' ? ($sortDirection == 'ASC' ? '▲' : '▼') : ''; ?></a></th>
+                    <th>Tipo</th>
                     <th>Acciones</th>
                 </tr>
             </thead>
@@ -161,23 +168,15 @@ if ($tareas === null) {
                         <td><?php echo $tarea->id; ?></td>
                         <td><?php echo $tarea->titulo; ?></td>
                         <td><?php echo $tarea->descripcion; ?></td>
-                        <td><?php echo $tarea->estado; ?></td>
+                        <td><?php echo ucfirst($tarea->estado); ?></td>
                         <td><?php echo $tarea->prioridad; ?></td>
-                        <td><?php echo $tarea->tipo; ?></td>
-                        <td><?php echo $tarea->fechaCreacion; ?></td>
+                        <td><?php echo ucfirst($tarea->tipo); ?></td>
                         <td>
-                            <a href='index.php?action=edit&id=<?php echo $tarea->id; ?>' class='btn btn-sm btn-warning'><i class='fas fa-edit'></i></a>
-                            <a href='index.php?action=delete&id=<?php echo $tarea->id; ?>' class='btn btn-sm btn-danger' onclick="return confirm('¿Está seguro de que desea eliminar esta tarea?');"><i class='fas fa-trash'></i></a>
-                            <div class='btn-group'>
-                                <button type='button' class='btn btn-sm btn-secondary dropdown-toggle' data-bs-toggle='dropdown'>
-                                    Estado
-                                </button>
-                                <ul class='dropdown-menu'>
-                                    <li><a class='dropdown-item' href='index.php?action=status&id=<?php echo $tarea->id; ?>&estado=pendiente'>Pendiente</a></li>
-                                    <li><a class='dropdown-item' href='index.php?action=status&id=<?php echo $tarea->id; ?>&estado=en_progreso'>En Progreso</a></li>
-                                    <li><a class='dropdown-item' href='index.php?action=status&id=<?php echo $tarea->id; ?>&estado=completada'>Completada</a></li>
-                                </ul>
-                            </div>
+                            <a href="index.php?action=edit&id=<?php echo $tarea->id; ?>" class="btn btn-sm btn-warning">Editar</a>
+                            <a href="index.php?action=delete&id=<?php echo $tarea->id; ?>" class="btn btn-sm btn-danger">Eliminar</a>
+                            <?php if ($tarea->estado != 'completada'): ?>
+                                <a href="index.php?action=status&id=<?php echo $tarea->id; ?>&estado=completada" class="btn btn-sm btn-success">Completar</a>
+                            <?php endif; ?>
                         </td>
                     </tr>
                 <?php endforeach; ?>
@@ -185,35 +184,14 @@ if ($tareas === null) {
         </table>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        document.getElementById('tipoTarea').addEventListener('change', function() {
-            const campoEspecifico = document.getElementById('campoEspecifico');
-            const campoDesarrollo = document.getElementById('campoDesarrollo');
-            const campoDiseno = document.getElementById('campoDiseno');
-            const campoTesting = document.getElementById('campoTesting');
-
-            campoEspecifico.style.display = 'none';
-            campoDesarrollo.style.display = 'none';
-            campoDiseno.style.display = 'none';
-            campoTesting.style.display = 'none';
-
-            switch (this.value) {
-                case 'desarrollo':
-                    campoEspecifico.style.display = 'block';
-                    campoDesarrollo.style.display = 'block';
-                    break;
-                case 'diseno':
-                    campoEspecifico.style.display = 'block';
-                    campoDiseno.style.display = 'block';
-                    break;
-                case 'testing':
-                    campoEspecifico.style.display = 'block';
-                    campoTesting.style.display = 'block';
-                    break;
-            }
+        document.getElementById('tipoTarea').addEventListener('change', function () {
+            var tipo = this.value;
+            document.getElementById('campoDesarrollo').style.display = tipo === 'desarrollo' ? 'block' : 'none';
+            document.getElementById('campoDiseno').style.display = tipo === 'diseno' ? 'block' : 'none';
+            document.getElementById('campoTesting').style.display = tipo === 'testing' ? 'block' : 'none';
+            document.getElementById('campoEspecifico').style.display = tipo ? 'block' : 'none';
         });
     </script>
 </body>
-
-</html>
+</html
