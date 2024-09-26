@@ -27,12 +27,45 @@ switch ($action) {
         $mensaje = "Tarea agregada exitosamente";
         break;
 
+
     case 'edit':
+        // Obtener el ID de la tarea a editar
         $id = $_GET['id'];
-        $tareaEditada = new Tarea($_GET);
-        $gestorTareas->editarTarea($id, $tareaEditada);
-        $mensaje = "Tarea actualizada exitosamente";
+        // Buscar la tarea en el gestor de tareas
+        $tareaEnEdicion = $gestorTareas->buscarTareaPorId($id);
+
+
+        //  var_dump(($tareaEnEdicion));  Esto lo utilizamos para ver los valores que se cargan
+
+        if (isset($_GET['titulo']) && isset($_GET['descripcion']) && isset($_GET['prioridad'])) {
+
+            //Estos datos son  una guia para armar los valores que se van a guardar al actualizar
+
+            $tareaEnEdicion->titulo = $_GET['titulo'];  //       "titulo": "Implementar login",
+
+            $tareaEnEdicion->descripcion = $_GET['descripcion']; //    "descripcion": "Crear formulario de login y backend",
+
+            $tareaEnEdicion->prioridad = $_GET['prioridad']; // prioridad": 2
+
+            $tareaEnEdicion->estado = $_GET['estado']; //  "estado": "completada",
+
+            $tareaEnEdicion->lenguajeProgramacion = $_GET['lenguajeProgramacion']; //"lenguajeProgramacion": "PHP",
+
+            $tareaEnEdicion->fechaCreacion = $_GET['fechaCreacion']; //  "fechaCreacion": "2024-09-20",
+
+            $tareaEnEdicion->tipo = $_GET['tipo']; //  "tipo": "desarrollo",
+
+            $tareaEnEdicion->herramientaDiseno = $_GET['herramientaDiseno']; //  "herramientaDiseno": null,
+
+            $tareaEnEdicion->tipoTest = $_GET['tipoTest']; //  "tipoTest": null
+
+            $gestorTareas->editarTarea($id, $tareaEnEdicion);
+            $mensaje = "Tarea actualizada exitosamente";
+        }
+
         break;
+
+
 
     case 'delete':
         $id = $_GET['id'];
@@ -65,6 +98,7 @@ if ($tareas === null) {
 ?>
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -72,11 +106,12 @@ if ($tareas === null) {
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
 </head>
+
 <body>
     <div class="container mt-5">
         <h1 class="mb-4">Gestor de Tareas</h1>
-        
-        <?php if (isset($mensaje)): ?>
+
+        <?php if (isset($mensaje)) : ?>
             <div class="alert alert-success" role="alert">
                 <?php echo $mensaje; ?>
             </div>
@@ -85,17 +120,15 @@ if ($tareas === null) {
         <!-- Formulario para agregar/editar tarea -->
         <form action="index.php" method="GET" class="row g-3 mb-4 align-items-end">
             <input type="hidden" name="action" value="<?php echo $tareaEnEdicion ? 'edit' : 'add'; ?>">
-            <?php if ($tareaEnEdicion): ?>
+            <?php if ($tareaEnEdicion) : ?>
                 <input type="hidden" name="id" value="<?php echo $tareaEnEdicion->id; ?>">
             <?php endif; ?>
-            
+
             <div class="col">
-                <input type="text" class="form-control" name="titulo" placeholder="Título" required
-                       value="<?php echo $tareaEnEdicion ? $tareaEnEdicion->titulo : ''; ?>">
+                <input type="text" class="form-control" name="titulo" placeholder="Título" required value="<?php echo $tareaEnEdicion ? $tareaEnEdicion->titulo : ''; ?>">
             </div>
             <div class="col">
-                <input type="text" class="form-control" name="descripcion" placeholder="Descripción" required
-                       value="<?php echo $tareaEnEdicion ? $tareaEnEdicion->descripcion : ''; ?>">
+                <input type="text" class="form-control" name="descripcion" placeholder="Descripción" required value="<?php echo $tareaEnEdicion ? $tareaEnEdicion->descripcion : ''; ?>">
             </div>
             <div class="col">
                 <select class="form-select" name="prioridad" required>
@@ -103,7 +136,7 @@ if ($tareas === null) {
                     <?php
                     for ($i = 1; $i <= 5; $i++) {
                         $selected = ($tareaEnEdicion && $tareaEnEdicion->prioridad == $i) ? 'selected' : '';
-                        echo "<option value=\"$i\" $selected>$i " . ($i == 1 ? '(Alta)' : ($i == 5 ? '(Baja)' : '')) . "</option>";
+                        echo "<option value=\"$i\" $selected>$i " . ($i == 1 ? 'Alta' : ($i == 2 ? 'Media Alta' : ($i == 3 ? 'Media' : ($i == 4 ? 'Media Baja' : 'Baja')))) . "</option>";
                     }
                     ?>
                 </select>
@@ -126,6 +159,14 @@ if ($tareas === null) {
                     <option value="e2e">E2E</option>
                 </select>
             </div>
+
+            <!--Aqui colocamos el campo de estado oculto para las tareas nuevas pendientes -->
+
+            <input type="hidden" name="estado" value="<?php echo $tareaEnEdicion ? $tareaEnEdicion->estado : 'pendiente'; ?>">
+
+            <!--Aqui colocamos el campo de fecha de creacion oculto para las tareas nuevas -->
+            <input type="hidden" name="fechaCreacion" value="<?php echo $tareaEnEdicion ? $tareaEnEdicion->fechaCreacion : date('Y-m-d'); ?>">
+
             <div class="col">
                 <button type="submit" class="btn btn-primary">
                     <?php echo $tareaEnEdicion ? 'Actualizar Tarea' : 'Agregar Tarea'; ?>
@@ -163,7 +204,7 @@ if ($tareas === null) {
                 </tr>
             </thead>
             <tbody>
-                <?php foreach ($tareas as $tarea): ?>
+                <?php foreach ($tareas as $tarea) : ?>
                     <tr>
                         <td><?php echo $tarea->id; ?></td>
                         <td><?php echo $tarea->titulo; ?></td>
@@ -174,9 +215,17 @@ if ($tareas === null) {
                         <td>
                             <a href="index.php?action=edit&id=<?php echo $tarea->id; ?>" class="btn btn-sm btn-warning">Editar</a>
                             <a href="index.php?action=delete&id=<?php echo $tarea->id; ?>" class="btn btn-sm btn-danger">Eliminar</a>
-                            <?php if ($tarea->estado != 'completada'): ?>
-                                <a href="index.php?action=status&id=<?php echo $tarea->id; ?>&estado=completada" class="btn btn-sm btn-success">Completar</a>
+
+
+                            <!-- Se modifico las opciones de mostrar el estado de la tarea -->
+
+                            <?php if ($tarea->estado == 'pendiente') : ?>
+                                <a href="index.php?action=status&id=<?php echo $tarea->id; ?>&estado=en_progreso" class="btn btn-sm btn-warning">En Progreso</a>
+                            <?php elseif ($tarea->estado == 'en_progreso') : ?>
+                                <a href="index.php?action=status&id=<?php echo $tarea->id; ?>&estado=completado" class="btn btn-sm btn-success">Completado</a>
+
                             <?php endif; ?>
+
                         </td>
                     </tr>
                 <?php endforeach; ?>
@@ -185,7 +234,7 @@ if ($tareas === null) {
     </div>
 
     <script>
-        document.getElementById('tipoTarea').addEventListener('change', function () {
+        document.getElementById('tipoTarea').addEventListener('change', function() {
             var tipo = this.value;
             document.getElementById('campoDesarrollo').style.display = tipo === 'desarrollo' ? 'block' : 'none';
             document.getElementById('campoDiseno').style.display = tipo === 'diseno' ? 'block' : 'none';
@@ -194,4 +243,5 @@ if ($tareas === null) {
         });
     </script>
 </body>
-</html
+
+</html>
