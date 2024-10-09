@@ -28,6 +28,43 @@ class GestorBlog {
         }
     }
 
+
+
+    /**************************************************************************/
+
+    public function agregarEntrada($nuevaEntrada) {
+        $entrada = $this->cargarEntradas();
+        $nuevaEntrada->id = count($tareas) + 1;
+        $entrada[] = $nuevaEntrada;
+        $this->guardarEntradas($entrada);
+    }
+
+    public function editarEntrada($id, $entradaEditada) {
+        $tareas = $this->cargarTareas();
+        foreach ($entradas as $key => $entrada) {
+            if ($entrada->id == $id) {
+                $entradaEditada->id = $id;
+                $entrada[$key] = $entradaEditada;
+                break;
+            }
+        }
+        $this->guardarEntradas($entrada);
+    }
+
+    public function eliminarEntrada($id) {
+        $entradas = $this->entradas();
+        foreach ($entradas as $key => $entradas) {
+            if ($entrada->id == $id) {
+                unset($entradas[$key]);
+                break;
+            }
+        }
+        $this->guardarTareas(array_values($entrada));
+    }
+
+
+    /*************************************************************************/
+
     public function guardarEntradas() {
         $data = array_map(function($entrada) {
             return get_object_vars($entrada);
@@ -38,4 +75,8 @@ class GestorBlog {
     public function obtenerEntradas() {
         return $this->entradas;
     }
-}   
+
+    public function gobtenerDetallesEspecificos() {
+        return $this->entrada;
+    }
+}

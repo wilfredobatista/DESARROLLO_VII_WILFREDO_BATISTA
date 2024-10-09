@@ -27,7 +27,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 if ($action === 'delete' && isset($_GET['id'])) {
-    // Implementar la lógica
+    $id = $_GET['id'];
+    $gestorBlog->eliminarEntrada($id);
     $mensaje = "Entrada eliminada con éxito.";
     $action = "list";
 }
