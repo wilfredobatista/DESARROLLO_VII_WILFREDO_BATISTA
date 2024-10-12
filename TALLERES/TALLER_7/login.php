@@ -1,9 +1,28 @@
-
 <?php
 session_start();
+// require_once 'config_sesion.php';
+
+
+include 'config_sesion.php';
+
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    if (!isset($_POST['csrf_token']) || $_POST['csrf_token'] !== $_SESSION['csrf_token']) {
+        die("Error de validación CSRF");
+    }
+    // ... resto del código de login ...
+}
+
+// Generar token CSRF
+$_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+
+
+
+
+
+
 
 // Si ya hay una sesión activa, redirigir al panel
-if(isset($_SESSION['usuario'])) {
+if (isset($_SESSION['usuario'])) {
     header("Location: panel.php");
     exit();
 }
@@ -14,7 +33,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $contrasena = $_POST['contrasena'];
 
     // En un caso real, verificaríamos contra una base de datos
-    if($usuario === "admin" && $contrasena === "1234") {
+    if ($usuario === "admin" && $contrasena === "1234") {
         $_SESSION['usuario'] = $usuario;
         header("Location: panel.php");
         exit();
@@ -26,10 +45,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <title>Login</title>
 </head>
+
 <body>
     <h2>Login</h2>
     <?php
@@ -38,6 +59,18 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
     ?>
     <form method="post" action="">
+
+        <form method="post" action="">
+            <!-- ... otros campos ... -->
+            <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token']; ?>">
+            <input type="submit" value="Iniciar Sesión">
+        </form>
+
+
+
+
+
+
         <label for="usuario">Usuario:</label><br>
         <input type="text" id="usuario" name="usuario" required><br><br>
         <label for="contrasena">Contraseña:</label><br>
@@ -45,4 +78,5 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         <input type="submit" value="Iniciar Sesión">
     </form>
 </body>
+
 </html>
