@@ -1,7 +1,6 @@
 <?php
 function sanitizarNombre($nombre) {
-    // return filter_var(trim($nombre), FILTER_SANITIZE_STRING);
-    return filter_var(trim($nombre));
+    return (trim($nombre));
 }
 
 function sanitizarEmail($email) {
@@ -17,14 +16,12 @@ function sanitizarSitioWeb($sitioWeb) {
 }
 
 function sanitizarGenero($genero) {
-    // return filter_var(trim($genero), FILTER_SANITIZE_STRING);
-    return filter_var(trim($genero));
+    return (trim($genero));
 }
 
 function sanitizarIntereses($intereses) {
     return array_map(function($interes) {
-        // return filter_var(trim($interes), FILTER_SANITIZE_STRING);
-        return filter_var(trim($interes));
+        return (trim($interes));
     }, $intereses);
 }
 
@@ -32,13 +29,19 @@ function sanitizarComentarios($comentarios) {
     return htmlspecialchars(trim($comentarios), ENT_QUOTES, 'UTF-8');
 }
 
-function sanitizarfechaNacimiento($fecha_nacimiento) {
-    // return filter_var(trim($fecha_nacimiento), FILTER_SANITIZE_STRING);
-    return (trim($fecha_nacimiento));
+
+
+
+
+
+function sanitizarFechaNacimiento($fechaNacimiento){
+
+    //elinimanos todos los espacios en blando y sanitizamos la fecha
+    return (trim($fechaNacimiento));
 }
 
-// function sanitizarFechaNacimiento($fecha_nacimiento){
-//     // return filter_var($edad, FILTER_SANITIZE_NUMBER_INT);
-//     return filter_var($fecha_nacimiento, FILTER_SANITIZE_NUMBER_INT);
-// }
+
+
+
+
 ?>

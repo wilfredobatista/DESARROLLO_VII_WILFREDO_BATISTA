@@ -11,17 +11,6 @@ function validarEdad($edad) {
     return is_numeric($edad) && $edad >= 18 && $edad <= 120;
 }
 
-
-function validarFechaNacimiento($fecha_nacimiento){
-
-    return date($fecha_nacimiento);
-}
-// function validarFechaNacimiento($fecha_nacimiento) {
-//     $fecha = DateTime::createFromFormat('Y-m-d', $fecha_nacimiento);
-//     return $fecha && $fecha->format('Y-m-d') === $fecha_nacimiento;
-// }
-
-
 function validarSitioWeb($sitioWeb) {
     return empty($sitioWeb) || filter_var($sitioWeb, FILTER_VALIDATE_URL);
 }
@@ -58,4 +47,34 @@ function validarFotoPerfil($archivo) {
 
     return true;
 }
+
+
+
+
+
+
+
+
+
+function validarFechaNacimiento($fechaNacimiento){
+//verificamos que la fecha no este vacia
+if (empty($fechaNacimiento)) {
+    return false;
+}
+//convertimos la fecha en un objeto DataTime
+$fecha = DateTime::createFromFormat('Y-m-d',$fechaNacimiento);
+
+// Verificar si la fecha es válida
+if (!$fecha) {
+    return false;
+}
+
+// Calcular la edad
+$hoy = new DateTime();
+$edad = $hoy->diff($fecha)->y;
+
+// Verificar que la edad esté entre 18 y 120 años
+return $edad >= 18 && $edad <= 120;
+}
+
 ?>
