@@ -16,7 +16,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Validar credenciales
     if (isset($estudiantes[$nombre_estudiante]) && $estudiantes[$nombre_estudiante] === $contrasena) {
 
-//validamo los datos 
+        //validamo los datos 
         if (strlen($nombre_estudiante) >= 5 && strlen($contrasena) >= 5) {
             $_SESSION['estudiante'] = $nombre_estudiante;
             header('Location: dashboard.php');
@@ -44,7 +44,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <h2>Inicio de general</h2>
     <form action="" method="post">
 
-    <h3>login para estudiantes</h3>
+        <h3>login para estudiantes</h3>
         <label for="estudiante">Usuario:</label>
         <input type="text" name="estudiante" id="estudiante" required>
         <br>
@@ -53,6 +53,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <br>
         <button type="submit">Iniciar Sesión</button>
     </form>
+
+
+    <form action="" method="post">
+
+        <h3>login para porfesores</h3>
+        <label for="profesores">Usuario:</label>
+        <input type="text" name="profesores" id="profesores" required>
+        <br>
+        <label for="contrasena">Contraseña:</label>
+        <input type="password" name="contrasena" id="contrasena" required>
+        <br>
+        <button type="submit">Iniciar Sesión</button>
+    </form>
+
+
     <?php if ($mensaje_error): ?>
         <p style="color: red;"><?php echo $mensaje_error; ?></p>
     <?php endif; ?>
