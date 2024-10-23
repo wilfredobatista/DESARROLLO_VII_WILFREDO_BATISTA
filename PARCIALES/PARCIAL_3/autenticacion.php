@@ -4,7 +4,7 @@ session_start();
 // Usuarios predefinidos (usuario => contraseña)
 $estudiantes = [
     'estudiante1' => 'password1',
-    'estudiante2' => 'password2',
+    'profesor1' => 'password2',
 ];
 
 $mensaje_error = '';
@@ -43,6 +43,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <body>
     <h2>Inicio de general</h2>
     <form action="" method="post">
+
+    <h3>login para estudiantes</h3>
         <label for="estudiante">Usuario:</label>
         <input type="text" name="estudiante" id="estudiante" required>
         <br>
