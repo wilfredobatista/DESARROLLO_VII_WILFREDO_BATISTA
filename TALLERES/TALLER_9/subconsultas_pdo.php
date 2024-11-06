@@ -89,9 +89,35 @@ try {
         echo "Cliente: {$row['cliente']}<br>"; 
     }
 
+
+    $categoria_id = 4; // Reemplaza con el ID de la categoría deseada
+    $sql = "SELECT c.nombre AS cliente
+    FROM clientes c
+    JOIN ventas v ON c.id = v.cliente_id
+    JOIN detalles_venta dv ON v.id = dv.venta_id
+    WHERE dv.producto_id IN (SELECT id FROM productos WHERE categoria_id = :categoria_id)
+    GROUP BY c.nombre
+    HAVING COUNT(DISTINCT dv.producto_id) = (SELECT COUNT(*) FROM productos WHERE categoria_id = :categoria_id)";
+    
+    $stmt = $pdo->prepare($sql);
+    $stmt->bindParam(':categoria_id', $categoria_id, PDO::PARAM_INT);
+    $stmt->execute();
+    
+    echo "<H3> Clientes que han comprado todos los productos de una categoria</H3>";
+    while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+    echo "Cliente: {$row['cliente']}<br>"; 
+    }
+    
+    
 } catch(PDOException $e) {
     echo "Error: " . $e->getMessage();
 }
+
+
+
+
+
+
 
 
 $pdo = null;

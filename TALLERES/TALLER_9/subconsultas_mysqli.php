@@ -110,5 +110,27 @@ if ($result){
 }
 
 
+
+$categoria_id = 4; // Reemplaza con el ID de la categoría deseada
+$sql = "SELECT c.nombre AS cliente
+        FROM clientes c
+        JOIN ventas v ON c.id = v.cliente_id
+        JOIN detalles_venta dv ON v.id = dv.venta_id
+        WHERE dv.producto_id IN (SELECT id FROM productos WHERE categoria_id = $categoria_id) -- Reemplaza '1' con el ID de la categoría deseada
+        GROUP BY c.nombre
+        HAVING COUNT(DISTINCT dv.producto_id) = (SELECT COUNT(*) FROM productos WHERE categoria_id = $categoria_id)"; //-- Reemplaza '1' con el ID de la categoría deseada;
+
+$result = mysqli_query($conn, $sql);
+
+if ($result){
+    echo "<H3> Porcetaje de ventas de cada producto respecto al total de ventas</H3>";
+    while ($row = mysqli_fetch_assoc($result)) {
+        echo "Cliente: {$row['cliente']}<br>"; 
+    }
+    mysqli_free_result($result);
+}
+
+
+
 mysqli_close($conn);
 ?>
