@@ -42,9 +42,10 @@ try {
         echo "Cliente: {$row['nombre']}, Total compras: {$row['total_compras']}, ";
         echo "Promedio general: {$row['promedio_ventas']}<br>";
     }
-} catch (PDOException $e) {
-    echo "Error: " . $e->getMessage();
-}
+
+
+
+
 $sql = "SELECT c.nombre AS categoria, 
             COUNT(p.id) AS numero_productos, 
             SUM(p.precio * p.stock) AS valor_total_inventario
@@ -67,12 +68,15 @@ while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
 
 
 
-require_once "config_pdo.php"; // Asegúrate de tener un archivo config_pdo.php con la configuración de la conexión PDO
+$sql_categorias = "SELECT id, nombre FROM categorias";
+$stmt_categorias = $pdo->query($sql_categorias);
+$categorias = $stmt_categorias->fetchAll(PDO::FETCH_ASSOC);
 
-try {
-    $categoria_id = 1; // Reemplaza con el ID de la categoría deseada
+// Iterar sobre cada categoría
+foreach ($categorias as $categoria) {
+    $categoria_id = $categoria['id'];
 
-    $sql = "SELECT c.nombre as cliente
+    $sql = "SELECT c.nombre AS cliente
             FROM clientes c
             JOIN ventas v ON c.id = v.cliente_id
             JOIN detalles_venta dv ON v.id = dv.venta_id
@@ -84,39 +88,54 @@ try {
     $stmt->bindParam(':categoria_id', $categoria_id, PDO::PARAM_INT);
     $stmt->execute();
 
-    echo "<H3> Clientes que han comprado todos los productos de una categoria</H3>";
-    while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-        echo "Cliente: {$row['cliente']}<br>"; 
+    echo "<h3>Categoría: " . $categoria['nombre'] . "</h3>";
+    
+    if ($stmt->rowCount() > 0) {
+        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+            echo "Cliente: " . $row['cliente'] . "<br>";
+        }
+    } else {
+        echo "No hay clientes que hayan comprado todos los productos de esta categoría.<br>";
     }
+}
 
+$categoria_id = 4; // Reemplaza con el ID de la categoría deseada
+$sql = "SELECT c.nombre AS cliente
+FROM clientes c
+JOIN ventas v ON c.id = v.cliente_id
+JOIN detalles_venta dv ON v.id = dv.venta_id
+WHERE dv.producto_id IN (SELECT id FROM productos WHERE categoria_id = :categoria_id)
+GROUP BY c.nombre
+HAVING COUNT(DISTINCT dv.producto_id) = (SELECT COUNT(*) FROM productos WHERE categoria_id = :categoria_id)";
 
-    $categoria_id = 4; // Reemplaza con el ID de la categoría deseada
-    $sql = "SELECT c.nombre AS cliente
-    FROM clientes c
-    JOIN ventas v ON c.id = v.cliente_id
-    JOIN detalles_venta dv ON v.id = dv.venta_id
-    WHERE dv.producto_id IN (SELECT id FROM productos WHERE categoria_id = :categoria_id)
-    GROUP BY c.nombre
-    HAVING COUNT(DISTINCT dv.producto_id) = (SELECT COUNT(*) FROM productos WHERE categoria_id = :categoria_id)";
-    
-    $stmt = $pdo->prepare($sql);
-    $stmt->bindParam(':categoria_id', $categoria_id, PDO::PARAM_INT);
-    $stmt->execute();
-    
-    echo "<H3> Clientes que han comprado todos los productos de una categoria</H3>";
-    while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-    echo "Cliente: {$row['cliente']}<br>"; 
-    }
-    
-    
-} catch(PDOException $e) {
-    echo "Error: " . $e->getMessage();
+$stmt = $pdo->prepare($sql);
+$stmt->bindParam(':categoria_id', $categoria_id, PDO::PARAM_INT);
+$stmt->execute();
+
+echo "<H3> Clientes que han comprado todos los productos de una categoria</H3>";
+while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+echo "Cliente: {$row['cliente']}<br>"; 
 }
 
 
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+} catch (PDOException $e) {
+    echo "Error: " . $e->getMessage();
+}
 
 
 

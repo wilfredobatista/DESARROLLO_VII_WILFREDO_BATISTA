@@ -111,7 +111,7 @@ if ($result){
 
 
 
-$categoria_id = 4; // Reemplaza con el ID de la categoría deseada
+$categoria_id = 1; // Reemplaza con el ID de la categoría deseada
 $sql = "SELECT c.nombre AS cliente
         FROM clientes c
         JOIN ventas v ON c.id = v.cliente_id
