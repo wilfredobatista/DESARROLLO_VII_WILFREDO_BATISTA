@@ -20,6 +20,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if (strlen($nombre_estudiante) >= 5 && strlen($contrasena) >= 5) {
             $_SESSION['estudiante'] = $nombre_estudiante;
             header('Location: dashboard.php');
+            
         }
 
 
